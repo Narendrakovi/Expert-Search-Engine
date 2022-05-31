@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Mar 10 01:19:42 2021
-
-@author: akanksh.belchada
+@author: Narendra Kovi
 """
 #pip install fastapi uvicorn
 # 1. Library imports
