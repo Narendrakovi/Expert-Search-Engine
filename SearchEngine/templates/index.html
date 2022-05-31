@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <title>SMS Spam Classifier</title>
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    </head>
+   <body>
+  <div class="container">
+    <div class="jumbotron">
+    <center>
+      <h1> <b>Expert Search Engine</b> </h1>
+    </center>
+    </div>
+    <center>
+    <label for="message_body">Enter Message</label><br>
+        
+            <textarea  placeholSder= "Enter your search key here"  id="textbox" style="height:100px;width:600px;"></textarea>
+    <br>
+    <br>
+    <button class="btn btn-success" onclick="performSpamClassification()"> Search </button>
+    <br>
+    
+        </center>
+    <hr style="width:100%;text-align:left;margin-left:0">
+    <hr style="width:100%;text-align:left;margin-left:0">
+    <div id="bulk_result" style="display: grid; grid-template-columns: repeat(5, 1fr); grid-gap: 10px;">
+  </div>
+</body>
+<script>
+    function performSpamClassification(){
+       
+       var message=document.getElementById("textbox").value
+       console.log(message)
+       var formData=new FormData();
+       console.log("Here")
+       var endpoint="/v1/authenticate_sms";
+        
+        console.log("Here")
+        formData.append("data",message)
+        console.log(formData)
+        console.log(typeof message)
+        
+         $.ajax({
+                url: endpoint,
+                type: "post",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                      "data": message
+                }),
+                  success: function(data) 
+                         {
+                            if (endpoint == '/v1/authenticate_sms')
+                            {
+                            if (data["The given SMS is"]=="LEGIT")
+                            {
+                            swal("Notification","The SMS is classified legit.");
+                           
+                            }
+                            else
+                            {
+                            swal("Warning", "The SMS has been classified as SPAM!")
+                            }
+                            }
+                          }                
+         });  
+    }
+    
+</script>
+
+</html>
+
