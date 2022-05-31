@@ -18,7 +18,7 @@
             <textarea  placeholSder= "Enter your search key here"  id="textbox" style="height:100px;width:600px;"></textarea>
     <br>
     <br>
-    <button class="btn btn-success" onclick="performSpamClassification()"> Search </button>
+    <button class="btn btn-success" onclick=""> Search </button>
     <br>
     
         </center>
@@ -27,47 +27,5 @@
     <div id="bulk_result" style="display: grid; grid-template-columns: repeat(5, 1fr); grid-gap: 10px;">
   </div>
 </body>
-<script>
-    function performSpamClassification(){
-       
-       var message=document.getElementById("textbox").value
-       console.log(message)
-       var formData=new FormData();
-       console.log("Here")
-       var endpoint="/v1/authenticate_sms";
-        
-        console.log("Here")
-        formData.append("data",message)
-        console.log(formData)
-        console.log(typeof message)
-        
-         $.ajax({
-                url: endpoint,
-                type: "post",
-                dataType: "json",
-                contentType: "application/json",
-                data: JSON.stringify({
-                      "data": message
-                }),
-                  success: function(data) 
-                         {
-                            if (endpoint == '/v1/authenticate_sms')
-                            {
-                            if (data["The given SMS is"]=="LEGIT")
-                            {
-                            swal("Notification","The SMS is classified legit.");
-                           
-                            }
-                            else
-                            {
-                            swal("Warning", "The SMS has been classified as SPAM!")
-                            }
-                            }
-                          }                
-         });  
-    }
-    
-</script>
-
 </html>
 
