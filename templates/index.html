@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css" rel="stylesheet"  type='text/css'>
+    <link rel="stylesheet" type="text/css" href="../public/stylesheets/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type ="text/javascript" src="../public/javascripts/index.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-dark navbar-expand-sm mr-auto">
+        <div class="container-fluid">  
+        <a class="navbar-brand" href="/">
+            ExpertSearch
+        </a>    
+        </div>
+    </nav>
+    
+<div class="container-fluid box">   
+    <a href="/" id ="logoheader">ExpertSearch</a>
+    <form class="form-inline" action ="/search" id="indexform">
+        <input class="form-control mr-1" type="text" placeholder="Search..." aria-label="Search" id ="indexSearchBar">
+        <button class="btn btn-info" type="submit" onclick="sendToPage()"><i class="fa fa-search" id="indexSubmitButton"></i></button>
+    </form>
+    
+    
+</div>
+
+</body>
