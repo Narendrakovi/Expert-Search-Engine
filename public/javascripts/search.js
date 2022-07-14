@@ -7,6 +7,28 @@ function filter(){
     
     let cards = document.createElement('div');
     cards.className ='container-fluid';
+    //console.log(search);        // Search is correctly allocated
+    $.ajax({ 
+        url: '/getdata', 
+        method: 'GET',
+        dataType: 'json',
+        data:
+        {
+            query: search      
+        }
+     })
+    .then(function(data)
+    {
+        data.forEach(element => {
+            let card = document.createElement('div');
+                card.className = 'row';
+                card.innerHTML = '<div class="card-body"><h1 class="card-title"><a href="' + element.websiteurl + '">' + element.websiteurl + '</a></h1><p class="card-subtitle">' + element.websiteurl + '</p><p class="card-text">' + element.description + '</p>'
+                
+                cards.appendChild(card);
+        });
+        cardcontainer.appendChild(cards);
+    })
+    /*
     fetch('./public/text/database.txt').then(response => response.text()).then(text =>{
         
         let db = text.split('\r\n');
@@ -31,6 +53,7 @@ function filter(){
         }
         cardcontainer.appendChild(cards);
     });
+    */
     return false;
 }
 

@@ -4,6 +4,7 @@ cd expersearch
 npm init
 npm install express
 npm install nodemon
+npm install mongoose
 
 How to start app:
 node app.js
