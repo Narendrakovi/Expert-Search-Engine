@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const path = require('path');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 80;
 
 app.use(express.urlencoded({extended : true}));  
 app.use(express.json());
