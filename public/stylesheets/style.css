@@ -1,5 +1,5 @@
 .navbar {
-    overflow: hidden;
+    overflow: visible;
     background-color: #333;
     position: fixed; /* Set the navbar to fixed position */
     top: 0; /* Position the navbar at the top of the page */
@@ -55,4 +55,21 @@ body{
     padding-bottom:50px;
     font-size:70px;
     text-decoration:none;
+}
+.dropdown{
+    display: inline;
+}
+#searchoptions{
+    width: 500px;
+}
+#symbolfilter{
+   margin-left: 5px;
+}
+p{
+    text-align: left;
+    margin-left:5px;
+}
+select{
+    display: inline-block;
+    margin-left: 5px;
 }
