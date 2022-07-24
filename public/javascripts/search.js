@@ -4,15 +4,24 @@ var typeSearch;
 var numOfResultsPerPage;
 var filterSymbols;
 var orderSearch;
+var pageNumber;
+var totalCount;
+var totalNumberOfPages;
+
 function changeSearch(){
     searchstr = document.getElementById('navBarSearchBar').value;
     typeSearch = document.getElementById('typeSearch').value;
     numOfResultsPerPage = document.getElementById('numOfResultsPerPage').value;
     filterSymbols = document.getElementById('symbolfilter').value;
     orderSearch = document.getElementById('orderSearch').value;
-
+    
     removeSymbols();
-    filter();
+    if(filteredsearchstr == "")
+    {
+        window.alert("Can't search with no input...")
+        return false
+    }  
+    updatePagenation();  
     return false;
 }
 function removeSymbols(){
@@ -25,13 +34,46 @@ function removeSymbols(){
         filteredsearchstr = filteredsearchstr.replaceAll(element, "");
     });
     filteredsearchstr = filteredsearchstr.trim();
+    
 }
-function filter(){
-    
-    
+function updatePagenation(){
 
-    var cardcontainer = document.getElementById('card-container');
+    $('#page-selection').twbsPagination('destroy');
+    $.ajax({ 
+        url: '/getcount', 
+        method: 'GET',
+        dataType: 'json',
+        data:
+        {
+            query: filteredsearchstr,
+            type: typeSearch,
+            order: orderSearch,
+            resultsperPage: numOfResultsPerPage,
+              
+        }
+     })
+    .then(function(data)
+    {
+        
+        
+        totalNumberOfPages = data.pageCount;
+        if($('#page-selection'))
+        $('#page-selection').twbsPagination({
+            totalPages: totalNumberOfPages,
+            visiblePages: 5,
+            startPage: 1,
+            
+            onPageClick: function (event, page) {
+                filter(page);
+            },
+        });
+        
+       
+    })
+}    
+function filter(page){
     
+    var cardcontainer = document.getElementById('card-container');
     
     cardcontainer.innerHTML="";
     
@@ -47,32 +89,49 @@ function filter(){
             query: filteredsearchstr,
             type: typeSearch,
             order: orderSearch,
-            resultsperPage: numOfResultsPerPage,     
+            resultsperPage: numOfResultsPerPage,
+            pageNumber: page   
         }
      })
     .then(function(data)
     {
+        console.log(data);
         
-        data.forEach(element => {
+        totalNumberOfPages = data.pageCount;
+        
+        if(data.data.length === 0)
+        {
             let card = document.createElement('div');
                 card.className = 'row';
-                card.innerHTML = '<div class="card-body"><h1 class="card-title"><a href="' + element.websiteurl + '">' + element.websiteurl + '</a></h1><p class="card-subtitle">' + element.websiteurl + '</p><p class="card-text">' + element.description + '</p>'
+                card.innerHTML = '<div class="card-body"><h1 class="card-title"><a>No Results Found...</a></h1><p class="card-subtitle"></p><p class="card-text">Please enter a new search query.</p>'
                 
                 cards.appendChild(card);
-        });
+        }
+        else
+        {
+            data.data.forEach(element => {
+                let card = document.createElement('div');
+                    card.className = 'row';
+                    card.innerHTML = '<div class="card-body"><h1 class="card-title"><a href="' + element.websiteurl + '">' + element.websiteurl + '</a></h1><p class="card-subtitle">' + element.websiteurl + '</p><p class="card-text">' + element.description + '</p>'
+                    
+                    cards.appendChild(card);
+            });
+        }          
+
         cardcontainer.appendChild(cards);
+        
+       
     })
     
-    return false;
+    
 }
 
-    
 
-window.addEventListener('load', () => {
-    
+$(document).ready(function(){
+
     $('#card-container').on("click", 'a', function(event){
         
-        var urls = {updateurl: event.currentTarget.innerHTML}
+        
         console.log("Card innerHTML = " + event.currentTarget.innerHTML);
         console.log("Test string = https://www.amctheatres.com")
         $.post("/update",
@@ -85,18 +144,30 @@ window.addEventListener('load', () => {
          });
          
     })
+    
+
     searchstr = sessionStorage.getItem('str');
     typeSearch = sessionStorage.getItem('typeSearch');
     numOfResultsPerPage = sessionStorage.getItem('numOfResultsPerPage');
     filterSymbols = sessionStorage.getItem('filterSymbols');   
     orderSearch = sessionStorage.getItem('orderSearch');
+    pageNumber = 1;
     document.getElementById('navBarSearchBar').value = searchstr;
     document.getElementById('typeSearch').value = typeSearch;
     document.getElementById('numOfResultsPerPage').value = numOfResultsPerPage;
     document.getElementById('symbolfilter').value = filterSymbols;
     document.getElementById('orderSearch').value = orderSearch;
+    
     removeSymbols();
-    filter();
+    if(filteredsearchstr == "")
+    {
+        window.alert("Can't search with no input...")
+        return false
+    }
+    updatePagenation();
+    
     
 })
+    
+    
 
