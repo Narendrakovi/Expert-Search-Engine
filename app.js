@@ -53,20 +53,35 @@ app.get('/getcount', async (req,res)=>{
          if(orderSearch == "ALPHABETICAL")
          {
              let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).countDocuments();
-             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage);
+             if(totalNumberOfPages == 0)
+             {
+                totalNumberOfPages = 1;
+
+             }
              res.send({pageCount: totalNumberOfPages});
          }
          else if(orderSearch == "FREQUENTLYACCESSED")
          {
              
              let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).sort({numAccessed: -1}).countDocuments();
-             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage);
+             if(totalNumberOfPages == 0)
+             {
+                totalNumberOfPages = 1;
+
+             }
              res.send({pageCount: totalNumberOfPages});
          }
          else
          {
              let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).sort({sponserPayment: -1}).countDocuments();
-             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage);
+             if(totalNumberOfPages == 0)
+             {
+                totalNumberOfPages = 1;
+
+             }
              res.send({pageCount: totalNumberOfPages});
          }        
     }
@@ -78,20 +93,35 @@ app.get('/getcount', async (req,res)=>{
          if(orderSearch == "ALPHABETICAL")
          {
              let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}).sort({name: 'asc'}).countDocuments();
-             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage);
+             if(totalNumberOfPages == 0)
+             {
+                totalNumberOfPages = 1;
+
+             }
              res.send({pageCount: totalNumberOfPages});
              
          }
          else if(orderSearch == "FREQUENTLYACCESSED")
          {
              let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}).sort({numAccessed: -1}).countDocuments();
-             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage);
+             if(totalNumberOfPages == 0)
+             {
+                totalNumberOfPages = 1;
+
+             }
              res.send({pageCount: totalNumberOfPages});
          }
          else
          {
              let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}).sort({sponserPayment: -1}).countDocuments();
-             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage);
+             if(totalNumberOfPages == 0)
+             {
+                totalNumberOfPages = 1;
+
+             }
              res.send({pageCount: totalNumberOfPages});
          }    
     }
@@ -100,19 +130,34 @@ app.get('/getcount', async (req,res)=>{
         if(orderSearch == "ALPHABETICAL")
          {
              let totalCount = await Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).countDocuments();
-             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage);
+             if(totalNumberOfPages == 0)
+             {
+                totalNumberOfPages = 1;
+
+             }
              res.send({pageCount: totalNumberOfPages});
          }
          else if(orderSearch == "FREQUENTLYACCESSED")
          {
              let totalCount = await Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).countDocuments();
-             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage);
+             if(totalNumberOfPages == 0)
+             {
+                totalNumberOfPages = 1;
+
+             }
              res.send({pageCount: totalNumberOfPages});
          }
          else
          {
              let totalCount = await Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).countDocuments();
-             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage);
+             if(totalNumberOfPages == 0)
+             {
+                totalNumberOfPages = 1;
+
+             }
              res.send({pageCount: totalNumberOfPages});
          }    
     }
