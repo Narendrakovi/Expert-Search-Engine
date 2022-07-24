@@ -209,3 +209,13 @@ app.listen(port, () => {
     
     }
   )
+function removeOutOfDateUrls()                              // Removes URLS that are 5 years old without being updated. Runs every 10 minutes
+{
+    date = new Date(Date.now());
+    date.setFullYear(date.getFullYear() - 5);
+    date = date.toISOString();
+    
+    let results = Websites.deleteMany({dateCreated: {'$lt': date}});
+    
+}
+setInterval(removeOutOfDateUrls,600000);
