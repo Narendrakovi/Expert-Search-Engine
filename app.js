@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const path = require('path');
+const { getSystemErrorMap } = require('util');
 const app = express();
 const port = process.env.PORT || 80;
 
@@ -26,7 +27,7 @@ db.on("error", console.error.bind(console, "connection error: "));
 db.once("open", function () {
   console.log("Connected successfully");
 });
-let seSchema= new mongoose.Schema({ websiteurl: { type: String, required: true }, title: {type: String, required: true},description: { type: String, required: true}, numAccessed: { type: Number, required: true }, sponserPayment: { type: Number, required: true}, dateCreated:{ type: Date, required: true}},{ strict: false },{collection : 'websites'});
+let seSchema= new mongoose.Schema({ websiteurl: { type: String, required: true }, title: {type: String, required: true},description: { type: String, required: true}, name: { type: String, required: true } ,numAccessed: { type: Number, required: true }, sponserPayment: { type: Number, required: true}, dateCreated:{ type: Date, required: true}},{ strict: false },{collection : 'websites'});
 var Websites = mongoose.model('Websites',seSchema);
 
 const staticPath = path.join(__dirname, "public")
@@ -38,26 +39,113 @@ app.get('/',(req,res) => {
 app.get('/search',(req,res) => {
     res.sendFile(path.join(__dirname,'/templates/search.html'))
 })
+app.get('/getcount', async (req,res)=>{
+  
+   
+    let query =  req.query.query; 
+    let typeSearch = req.query.type;
+    let orderSearch = req.query.order;
+    let numOfResultsPerPage = req.query.resultsperPage;
+    
+    
+    if(typeSearch == "AND")      // AND
+    {
+         if(orderSearch == "ALPHABETICAL")
+         {
+             let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).countDocuments();
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             res.send({pageCount: totalNumberOfPages});
+         }
+         else if(orderSearch == "FREQUENTLYACCESSED")
+         {
+             
+             let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).sort({numAccessed: -1}).countDocuments();
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             res.send({pageCount: totalNumberOfPages});
+         }
+         else
+         {
+             let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).sort({sponserPayment: -1}).countDocuments();
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             res.send({pageCount: totalNumberOfPages});
+         }        
+    }
+    else if (typeSearch == "OR")     // OR           
+    {
+         let queryArray = query.split(" ");          
+         let allqueries = queryArray.join("|");      // Found method googling MongoDB query $in with regex array of element
+         
+         if(orderSearch == "ALPHABETICAL")
+         {
+             let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}).sort({name: 'asc'}).countDocuments();
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             res.send({pageCount: totalNumberOfPages});
+             
+         }
+         else if(orderSearch == "FREQUENTLYACCESSED")
+         {
+             let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}).sort({numAccessed: -1}).countDocuments();
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             res.send({pageCount: totalNumberOfPages});
+         }
+         else
+         {
+             let totalCount = await Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}).sort({sponserPayment: -1}).countDocuments();
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             res.send({pageCount: totalNumberOfPages});
+         }    
+    }
+    else                            // NOT
+    {
+        if(orderSearch == "ALPHABETICAL")
+         {
+             let totalCount = await Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).countDocuments();
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             res.send({pageCount: totalNumberOfPages});
+         }
+         else if(orderSearch == "FREQUENTLYACCESSED")
+         {
+             let totalCount = await Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).countDocuments();
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             res.send({pageCount: totalNumberOfPages});
+         }
+         else
+         {
+             let totalCount = await Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).countDocuments();
+             let totalNumberOfPages = Math.floor(totalCount / numOfResultsPerPage) + 1;
+             res.send({pageCount: totalNumberOfPages});
+         }    
+    }
+    
+    
+ })
 app.get('/getdata', async (req,res)=>{
   
    
    let query =  req.query.query; 
    let typeSearch = req.query.type;
    let orderSearch = req.query.order;
-   let numOfResultsPerPage = req.query.numOfResultsPerPage;
+   let numOfResultsPerPage = req.query.resultsperPage;
+   let pageNumber = req.query.pageNumber;
+   
    if(typeSearch == "AND")      // AND
    {
         if(orderSearch == "ALPHABETICAL")
         {
-            Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}, function(err, doc){ res.send(doc);}).sort({title: 'asc'});
+            
+            let results= await Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).limit(numOfResultsPerPage).skip((pageNumber - 1) * numOfResultsPerPage).sort({name: 'asc'});
+            res.send({data: results});
         }
         else if(orderSearch == "FREQUENTLYACCESSED")
-        {
-            Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}, function(err, doc){ res.send(doc);}).sort({numAccessed: -1});
+        {            
+            let results= await Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).limit(numOfResultsPerPage).skip((pageNumber - 1) * numOfResultsPerPage).sort({numAccessed: -1});
+            res.send({data: results});
         }
         else
         {
-            Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}, function(err, doc){ res.send(doc);}).sort({sponserPayment: -1});
+           
+            let results= await Websites.find({$or: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).limit(numOfResultsPerPage).skip((pageNumber - 1) * numOfResultsPerPage).sort({sponserPayment: -1});
+            res.send({data: results});
         }        
    }
    else if (typeSearch == "OR")     // OR           
@@ -67,30 +155,38 @@ app.get('/getdata', async (req,res)=>{
         
         if(orderSearch == "ALPHABETICAL")
         {
-            Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}, function(err, doc){ res.send(doc);}).sort({title: 'asc'});
+            let results= await Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}).limit(numOfResultsPerPage).skip((pageNumber - 1) * numOfResultsPerPage).sort({name: 'asc'});
+            res.send({data: results});
+            
         }
         else if(orderSearch == "FREQUENTLYACCESSED")
         {
-            Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}, function(err, doc){ res.send(doc);}).sort({numAccessed: -1});
+            
+            let results= await Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}).limit(numOfResultsPerPage).skip((pageNumber - 1) * numOfResultsPerPage).sort({numAccessed: -1});
+            res.send({data: results});
         }
         else
         {
-            Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}, function(err, doc){ res.send(doc);}).sort({sponserPayment: -1});
+            let results= await Websites.find({$or: [{'websiteurl': {"$regex": allqueries}}, {'description': {"$regex": allqueries}}]}).limit(numOfResultsPerPage).skip((pageNumber - 1) * numOfResultsPerPage).sort({sponserPayment: -1});
+            res.send({data: results});
         }    
    }
    else                            // NOT
    {
        if(orderSearch == "ALPHABETICAL")
         {
-            Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}, function(err, doc){ res.send(doc);}).sort({title: 'asc'});
+            let results = await Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).limit(numOfResultsPerPage).skip((pageNumber - 1) * numOfResultsPerPage).sort({name: 'asc'});
+            res.send({data: results});
         }
         else if(orderSearch == "FREQUENTLYACCESSED")
         {
-            Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}, function(err, doc){ res.send(doc);}).sort({numAccessed: -1});
+            let results = await Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).limit(numOfResultsPerPage).skip((pageNumber - 1) * numOfResultsPerPage).sort({numAccessed: -1});
+            res.send({data: results});
         }
         else
         {
-            Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}, function(err, doc){ res.send(doc);}).sort({sponserPayment: -1});
+            let results = await Websites.find({$nor: [{'websiteurl': {"$regex": query}}, {'description': {"$regex": query}}]}).limit(numOfResultsPerPage).skip((pageNumber - 1) * numOfResultsPerPage).sort({sponserPayment: -1});
+            res.send({data: results});
         }    
    }
    
