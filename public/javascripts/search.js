@@ -27,18 +27,22 @@ function changeSearch(){
 function removeSymbols(){
 
     let rmspaces = filterSymbols.replaceAll(/\s{2,}/g,' ');
+    console.log(rmspaces);
     rmspaces = rmspaces.split(' ');
     filteredsearchstr = searchstr;
+    console.log(filteredsearchstr);
     rmspaces.forEach(element => {
         
         filteredsearchstr = filteredsearchstr.replaceAll(element, "");
     });
     filteredsearchstr = filteredsearchstr.trim();
+    console.log(filteredsearchstr);
     
 }
 function updatePagenation(){
 
     $('#page-selection').twbsPagination('destroy');
+    console.log(filteredsearchstr);
     $.ajax({ 
         url: '/getcount', 
         method: 'GET',
@@ -79,7 +83,7 @@ function filter(page){
     
     let cards = document.createElement('div');
     cards.className ='container-fluid';
-
+    console.log(filteredsearchstr);
     $.ajax({ 
         url: '/getdata', 
         method: 'GET',
@@ -95,7 +99,7 @@ function filter(page){
      })
     .then(function(data)
     {
-        console.log(data);
+        
         
         totalNumberOfPages = data.pageCount;
         
@@ -110,9 +114,16 @@ function filter(page){
         else
         {
             data.data.forEach(element => {
+
                 let card = document.createElement('div');
+                
                     card.className = 'row';
-                    card.innerHTML = '<div class="card-body"><h1 class="card-title"><a href="' + element.websiteurl + '">' + element.websiteurl + '</a></h1><p class="card-subtitle">' + element.websiteurl + '</p><p class="card-text">' + element.description + '</p>'
+                    if(element.description == null)
+                    {
+                        card.innerHTML = '<div class="card-body"><h1 class="card-title"><a href="' + element.websiteurl + '">' + element.websiteurl + '</a></h1><p class="card-subtitle">' + element.websiteurl + '</p><p class="card-text">' + '</p>'
+                    }
+                    else
+                        card.innerHTML = '<div class="card-body"><h1 class="card-title"><a href="' + element.websiteurl + '">' + element.websiteurl + '</a></h1><p class="card-subtitle">' + element.websiteurl + '</p><p class="card-text">' + element.description + '</p>'
                     
                     cards.appendChild(card);
             });
