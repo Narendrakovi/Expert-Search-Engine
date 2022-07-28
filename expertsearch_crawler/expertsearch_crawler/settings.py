@@ -22,13 +22,14 @@ NEWSPIDER_MODULE = 'expertsearch_crawler.spiders'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
+#Pipeline to write results to MongoDB
 ITEM_PIPELINES = {
     'expertsearch_crawler.pipelines.MongoDBPipeline': 300,
 }
 
 MONGO_URI = "mongodb+srv://connor:OOADProject6359@expertsearch.vx8cj.mongodb.net/?retryWrites=true&w=majority"
-MONGO_DATABASE = "test"
-MONOGO_COLLECT = "testtb"
+MONGO_DATABASE = "webengine"
+MONOGO_COLLECT = "websites"
 
 #Free proxies may not be safe
 '''
@@ -40,16 +41,25 @@ DOWNLOADER_MIDDLEWARES = {
 }
 '''
 
-#Proxies using free https protocol
-'''
-ROTATING_PROXY_LIST_PATH = '/my/path/proxies.txt'
+#proxies
+ROTATING_PROXY_LIST_PATH = './proxies.txt'
+ROTATING_PROXY_PAGE_RETRY_TIMES = 3
 DOWNLOADER_MIDDLEWARES = {
     # ...
     'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
     'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
     # ...
 }
+
+#Use breadth-first instead of depth-first order
 '''
+DEPTH_PRIORITY = 1
+SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleFifoDiskQueue'
+SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.FifoMemoryQueue'
+'''
+
+DEPTH_LIMIT = 5
+
 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
